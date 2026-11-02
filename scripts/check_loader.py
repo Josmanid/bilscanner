@@ -9,5 +9,6 @@ signal = loader.load("data/02_tomgang_750rpm.ogg")
 print("Antal samples N: ", len(signal.samples))
 print("Samplefrekvens f_s: ", signal.fs)
 
-
+# duration() regner T = N / f_s (formel 7.2)
+print("Varighed T:", signal.duration(), "s")
 
