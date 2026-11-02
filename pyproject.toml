@@ -1,0 +1,14 @@
+# Hvilket værktøj der bygger pakken
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+# version og navn
+[project]
+name = "bilscanner"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+# Koden ligger i src/
+[tool.setuptools.packages.find]
+where = ["src"]
