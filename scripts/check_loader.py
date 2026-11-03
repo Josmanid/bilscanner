@@ -3,7 +3,7 @@ from bilscanner.loader import AudioLoader
 loader = AudioLoader() # laver et nyt objekt på heapen ligesom C#
 
 # indlæs filen
-signal = loader.load("data/02_tomgang_750rpm.ogg")
+signal = loader.load("data/04_svingende_1000_2000rpm.ogg")
 
 # len() tæller elementerne i arrayet, altså N, antallet af samples
 print("Antal samples N: ", len(signal.samples))
