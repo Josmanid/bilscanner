@@ -28,9 +28,10 @@ class SpectrumAnalyzer:
         # Find de rå amplituder via den absolutte værdi (Pythagoras på de komplekse tal)
         raw_amplitudes = np.abs(F)
         
-        # Beregn peak-amplitude (A i A*sin(...)). 
-        # Vi ganger med 2, fordi rfft kun dækker den positive halvdel af spektret,
-        # og dividerer med (N * w_mean) for at korrigere for hhv. signallængde og vinduesdæmpning.
+        # 2 fordi rfft kun viser den positive halvdel.
+        # / N fordi summen i formel 7.5 vokser med optagelsens længde. Svarer til c_m = F(m)/N fra Jørgens slide 2.
+        # / w̄ fordi vinduet dæmper. Findes ved at lægge vinduet på 1-taller.
+        # Stakit-effekten: 0,96 i stedet for 1, fordi 18,75 Hz ligger mellem to streger.
         amplitudes = (2.0 * raw_amplitudes) / (N * w_mean)
         
         # DC-komponenten (0 Hz) skal ikke ganges med 2
