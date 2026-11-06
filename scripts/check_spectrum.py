@@ -12,7 +12,7 @@ analyzer = SpectrumAnalyzer(HanningWindow())
 
 spectrum = analyzer.analyse(signal = signal)
 
-m = np.argmax(spectrum.amplitudes)
+m_peak = np.argmax(spectrum.amplitudes)   # nummeret m for den højeste streg
 
 # Brug pladsen m til at slå op i begge lister
 print("Frekvens ved toppen:  ", spectrum.frequencies[m], "Hz")
