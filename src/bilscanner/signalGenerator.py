@@ -91,15 +91,7 @@ class SignalGenerator:
         fs: float,
         seed: int | None = None,
     ) -> Signal:
-        """Hvid støj: tilfældige samples med fladt spektrum.
-
-        Hvid betyder, at støjen har lige meget effekt ved alle frekvenser,
-        ligesom hvidt lys indeholder alle farver. Samplene trækkes fra en
-        normalfordeling med middelværdi 0 og spredningen std.
-
-        Bruges til at teste Welch: støjen er tilfældig og forskellig i
-        hvert stykke af optagelsen, så gennemsnittet gør gulvet jævnt.
-
+        """Hvid støj
         Parametre:
             std:      spredningen, altså hvor kraftig støjen er
             duration: længden T i sekunder
