@@ -84,3 +84,41 @@ class SignalGenerator:
         """Antal samples, N = T * f_s (formel 7.2)."""
         return int(duration * fs)
 
+    def white_noise(
+        self,
+        std: float,
+        duration: float,
+        fs: float,
+        seed: int | None = None,
+    ) -> Signal:
+        """Hvid støj: tilfældige samples med fladt spektrum.
+
+        Hvid betyder, at støjen har lige meget effekt ved alle frekvenser,
+        ligesom hvidt lys indeholder alle farver. Samplene trækkes fra en
+        normalfordeling med middelværdi 0 og spredningen std.
+
+        Bruges til at teste Welch: støjen er tilfældig og forskellig i
+        hvert stykke af optagelsen, så gennemsnittet gør gulvet jævnt.
+
+        Parametre:
+            std:      spredningen, altså hvor kraftig støjen er
+            duration: længden T i sekunder
+            fs:       samplefrekvensen f_s i Hz
+            seed:     startværdi for tilfældighederne. Samme seed giver
+                      samme støj hver gang, så en test kan gentages.
+                      None giver ny støj hver gang.
+        """
+        # Skridt 1: Antal samples, N = T * f_s (formel 7.2)
+        N = self._num_samples(duration, fs)
+
+        # Skridt 2: En tilfældighedsgenerator.
+        # Med et seed starter den samme sted hver gang.
+        rng = np.random.default_rng(seed)
+
+        # Skridt 3: N tilfældige tal fra en normalfordeling,
+        # middelværdi 0 og spredning std
+        samples = rng.normal(0.0, std, N)
+
+        return Signal(samples=samples, fs=fs)
+    
+
