@@ -1,4 +1,3 @@
--e git+https://github.com/Josmanid/bilscanner.git@f0ef34663f3c20305d596e8c9c6418b5b81a2019#egg=bilscanner
 cffi==2.1.1
 colorama==0.4.6
 contourpy==1.4.0
