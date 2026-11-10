@@ -32,11 +32,11 @@ En trecylindret rækkemotor har desuden en indbygget ubalance ved f_k. Den ligge
 
 ## Første resultat
 
-Tomgangsoptagelsen viser en række toppe med ca. 22,5 Hz imellem, fra 67,5 Hz op til 450 Hz. Fx ligger den 4. harmoniske ved 90,3 Hz, hvilket svarer til ca. 903 omdr./min.
+Tomgangsoptagelsen viser en række toppe med ca. 22,5 Hz imellem, fra 67,5 Hz op til 450 Hz. Fx ligger den 4. harmoniske ved 90,3 Hz, hvilket svarer til ca. 903 omdr./min. Havde i første omgang aflæst omdrejningstallet forkert til 750 med varm motor.
 
-Analysen forudsagde altså en tomgang på ca. 900 omdr./min. ud fra lyden alene. Omdrejningstælleren bekræftede efterfølgende 900 omdr./min. med varm motor.
+Analysen forudsagde dog en tomgang på ca. 900 omdr./min. ud fra lyden alene. Omdrejningstælleren bekræftede efterfølgende 900 omdr./min. med varm motor.
 
-Sammenligning med støjoptagelsen viser, at alle de skarpe toppe kommer fra bilen. Toppene ved ca. 19,4 og 39,5 Hz passer ikke ind i rækken og ser ud til at have en anden kilde i bilen. Optagelsen ved 2500 omdr./min. skal vise, om de følger motoren.
+Sammenligning med støjoptagelsen viser, at alle de skarpe toppe kommer fra bilen, og motorens støjgulv ligger omkring 300 Hz+. Toppene ved ca. 19,4 og 39,5 Hz passer ikke ind i rækken og ser ud til at have en anden kilde i bilen. Optagelsen ved 2500 omdr./min. skal vise, om de følger motoren.
 
 ## Metode
 
