@@ -31,6 +31,7 @@ Tændingerne er korte stød med jævne mellemrum, altså et periodisk signal. If
 En trecylindret rækkemotor har desuden en indbygget ubalance ved f_k. Den ligger dog så lavt, at telefonens mikrofon næppe kan høre den.
 
 ## Første resultat
+<img width="777" height="587" alt="image" src="https://github.com/user-attachments/assets/32771243-70b4-4e73-ad58-9c8532847cf4" />
 
 Tomgangsoptagelsen viser en række toppe med ca. 22,5 Hz imellem, fra 67,5 Hz op til 450 Hz. Fx ligger den 4. harmoniske ved 90,3 Hz, hvilket svarer til ca. 903 omdr./min. Havde i første omgang aflæst omdrejningstallet forkert til 750 med varm motor.
 
