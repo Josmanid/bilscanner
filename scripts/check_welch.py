@@ -76,7 +76,7 @@ m_welch = np.argmax(spectrum_welch.amplitudes)
 # har f0 = 0,2 Hz, så det samme filter passer til begge.
 band = (spectrum_welch.frequencies >= 100) & (spectrum_welch.frequencies <= 200)
 
-# .std() er spredningen: hvor meget gulvet hopper op og ned
+# .std() er spredningen: hvor meget gulvet hopper op og ned i frekvenserne 
 std_single = spectrum_single.amplitudes[band].std()
 std_welch = spectrum_welch.amplitudes[band].std()
 
