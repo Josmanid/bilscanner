@@ -1,7 +1,11 @@
+"""
+Formål: Finde intervallet i tid, hvor motoren er i 2500 omdrejninger
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 from bilscanner.sources.loader import AudioLoader
+from bilscanner.models.signal import Signal
 
 loader = AudioLoader()
 
@@ -18,5 +22,13 @@ plt.ylabel("Amplitude")
 
 plt.show()
 
+print("----------------cut signal---------------")
+
+start = int(20*fs)
+end = int(55*fs)
+
+signal_2500rpm_cut = Signal(samples=samples[start:end],fs=fs)
+
+print(signal_2500rpm_cut.duration())
 
 
