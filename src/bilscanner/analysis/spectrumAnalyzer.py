@@ -1,7 +1,7 @@
 import numpy as np
 from .window import Window
-from .signal import Signal
-from .spectrum import Spectrum
+from ..models.signal import Signal
+from ..models.spectrum import Spectrum
 
 class SpectrumAnalyzer:
     def __init__(self, window: Window):

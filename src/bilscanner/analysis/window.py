@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from .signal import Signal
+from ..models.signal import Signal
 
 
 class Window(ABC):

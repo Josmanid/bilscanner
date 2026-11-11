@@ -28,8 +28,8 @@ Konsekvenser for trin 4:
        høje og skal ganges med 2 for at vise den rigtige amplitude.
 """
 
-from bilscanner.signalGenerator import SignalGenerator
-from bilscanner.window import HanningWindow, RectangularWindow
+from bilscanner.sources.signalGenerator import SignalGenerator
+from bilscanner.analysis.window import HanningWindow, RectangularWindow
 
 
 generator = SignalGenerator()

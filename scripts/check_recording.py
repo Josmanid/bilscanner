@@ -17,10 +17,10 @@ Kør fra roden:
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bilscanner.loader import AudioLoader
-from bilscanner.spectrumAnalyzer import SpectrumAnalyzer
-from bilscanner.welchAnalyzer import WelchAnalyzer
-from bilscanner.window import HanningWindow
+from bilscanner.sources.loader import AudioLoader
+from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
+from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
+from bilscanner.analysis.window import HanningWindow
 
 # Indlæs optagelsen som et Signal: samples f(n) og f_s
 loader = AudioLoader()

@@ -1,5 +1,5 @@
 import numpy as np
-from .signal import Signal
+from ..models.signal import Signal
 
 class SignalGenerator: 
     def sine(

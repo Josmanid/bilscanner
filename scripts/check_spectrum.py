@@ -1,7 +1,7 @@
 import numpy as np
-from bilscanner.signalGenerator import SignalGenerator
-from bilscanner.spectrumAnalyzer import SpectrumAnalyzer
-from bilscanner.window import HanningWindow, RectangularWindow
+from bilscanner.sources.signalGenerator import SignalGenerator
+from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
+from bilscanner.analysis.window import HanningWindow, RectangularWindow
 
 
 generator = SignalGenerator()

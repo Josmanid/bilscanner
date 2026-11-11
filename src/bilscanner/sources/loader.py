@@ -1,6 +1,6 @@
 import soundfile as sf
 
-from .signal import Signal
+from ..models.signal import Signal
 
 
 class AudioLoader:

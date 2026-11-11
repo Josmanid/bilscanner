@@ -6,7 +6,7 @@ Kør fra roden af projektet:
 Facit: 240 000 samples, 48 000 Hz, 5,0 s og max-værdi 1,0.
 """
 
-from bilscanner.signalGenerator import SignalGenerator
+from bilscanner.sources.signalGenerator import SignalGenerator
 
 generator = SignalGenerator()
 

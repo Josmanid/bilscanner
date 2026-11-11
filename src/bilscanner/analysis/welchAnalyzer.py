@@ -13,8 +13,8 @@ Afvejning:
 
 import numpy as np
 
-from .signal import Signal
-from .spectrum import Spectrum
+from ..models.signal import Signal
+from ..models.spectrum import Spectrum
 from .spectrumAnalyzer import SpectrumAnalyzer
 
 
