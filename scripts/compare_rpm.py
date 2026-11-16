@@ -29,11 +29,14 @@ spectrum_2500rpm_cut = welch.analyse(signal_2500rpm_cut)
 
 print("------------- plots -------------")
 
-# Fra amplitude til decibel: L = 20 * log10(A / A_ref)
-#   20 og ikke 10, fordi A er en amplitude. Effekt er A²,
-#   og 10 * log10(A²) = 20 * log10(A).
+# Fra amplitude til decibel.
+#   Decibel er defineret ud fra effekt:  L = 10 * log10(P / P_ref)
+#   Effekt er amplitude i anden, P = A², så:
+#     L = 10 * log10(A² / A_ref²) = 20 * log10(A / A_ref)
+#   Samme decibel, 20 er bare genvejen, når man har amplituden.
+#   Fx: 10 gange større amplitude er 100 gange større effekt,
+#     og begge giver 20 dB: 20 * log10(10) = 10 * log10(100) = 20.
 #   A_ref = 1, altså fuld skala, så enheden er dBFS.
-#   En faktor 10 i amplitude giver altid 20 dB.
 # 1e-12 lægges til, fordi log10(0) er minus uendelig.
 db_900rpm = 20 * np.log10(spectrum_900rpm.amplitudes + 1e-12)
 db_2500rpm = 20 * np.log10(spectrum_2500rpm_cut.amplitudes + 1e-12)
