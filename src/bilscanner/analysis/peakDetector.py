@@ -17,7 +17,7 @@ from ..models.spectrum import Spectrum
 class PeakDetector:
     """Finder toppe, der stikker tydeligt op over støjgulvet."""
 
-    def __init__(self, threshold_db: float = 10, min_distance_hz: float = 1.0):
+    def __init__(self, threshold_db: float = 8, min_distance_hz: float = 2.0):
         # Hvor mange dB over gulvet en top mindst skal ligge
         self.threshold_db = threshold_db
         # Mindste afstand mellem to toppe, så én top kun tælles én gang
@@ -31,8 +31,8 @@ class PeakDetector:
         above_floor_db = 20 * np.log10(amp_spectrum / amp_floor)
 
         # Skridt 2: Mindste afstand i streger.
-        # Fra f = m * f0 fås m = f / f0, så 1 Hz / 0,2 Hz = 5 streger.
-        # Mindst 1, som find_peaks kræver.
+        # Fra f = m * f0 fås m = f / f0, så 2 Hz / 0,2 Hz = 10 streger.
+        # Mindst 1, som find_peaks kræver. Sikre at en top kun findes en gang.
         distance = max(1, int(self.min_distance_hz / spectrum.f0))
 
         # Skridt 3: Find de lokale toppe over tærsklen.
