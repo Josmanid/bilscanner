@@ -7,24 +7,34 @@ from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
 from bilscanner.analysis.window import HanningWindow
 from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
 from bilscanner.analysis.noiseFloorEstimator import NoiseFloorEstimator
+from bilscanner.analysis.peakDetector import PeakDetector
 
 loader = AudioLoader()
 
-analyzer = SpectrumAnalyzer(window=HanningWindow())
+analyze_spectrum = SpectrumAnalyzer(window=HanningWindow())
+
+detect_peaks = PeakDetector()
 
 # signals
 signal_900rpm = loader.load("data/02_tomgang_900rpm.ogg")
 
 
-welch = WelchAnalyzer(analyzer=analyzer,segment_duration=5)
+welch = WelchAnalyzer(analyzer=analyze_spectrum,segment_duration=5)
 noise_floor_estimator = NoiseFloorEstimator()
 
 # spectrums
 spectrum_900rpm = welch.analyse(signal_900rpm)
 
+
 # finder gulvet af welch spektrummet
 spectrum_900rpm_noise_floor = noise_floor_estimator.estimate(spectrum_900rpm)
 
+#benyt detect
+analysed_peaks = detect_peaks.detect(spectrum_900rpm,spectrum_900rpm_noise_floor)
+
+# print frekvenserne
+for peak in analysed_peaks:
+    print(f"{peak.frequency:7.1f} Hz   {peak.above_floor_db:5.1f} dB over gulvet")
 
 # Fra amplitude til dB, som i compare_rpm.py.
 # 1e-12 lægges til, fordi log10(0) er minus uendelig.
