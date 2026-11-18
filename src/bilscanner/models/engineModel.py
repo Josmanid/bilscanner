@@ -3,7 +3,7 @@ from .peak import Peak
 
 
 @dataclass
-class EngineEstimate:
+class EngineModel:
     """
     Holds the engine estimate: firing frequency, revolutions per minute
     and the peaks that matched the harmonic comb.
