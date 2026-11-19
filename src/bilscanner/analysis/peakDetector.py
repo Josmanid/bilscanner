@@ -46,9 +46,9 @@ class PeakDetector:
         peaks = []
         for m in indices:
             peaks.append(Peak(
-                frequency=spectrum.frequencies[m],
-                amplitude=spectrum.amplitudes[m],
-                above_floor_db=above_floor_db[m],
+                frequency=float(spectrum.frequencies[m]),
+                amplitude=float(spectrum.amplitudes[m]),
+                above_floor_db=float(above_floor_db[m]),
             ))
 
         # Skridt 5: Returnér listen af toppe
