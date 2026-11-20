@@ -1,96 +1,164 @@
-# bilscanner
+# Car scanner
 
-Signalbehandlingsdemo, der påviser en motors karakteristik ved forskellige omdrejningstal i stilstand. Første projekt ud af tre.
+Estimating a car engine's speed from a phone recording of its sound, using classic signal analysis.
 
-## Mål
+The demo listens to a three-cylinder Hyundai i10 at idle and at about 2500 rpm, finds the engine's harmonics in the spectrum, and calculates the engine speed without being told what it is. The result is then checked against the car's rev counter.
 
-Demoen er en **måling, ikke en diagnose**. Den skal vise, at værktøjet virker, og at fysikken passer:
-
-- Motorens tændingsfrekvens og dens harmoniske kan findes i en optagelse i tomgang.
-- Toppene flytter sig, når omdrejningstallet ændres.
-- Den fundne tændingsfrekvens passer med omdrejningstælleren.
-
-## Fysikken
-
-For en firetaktsmotor tænder hver cylinder hver anden omdrejning:
-
-```
-krumtapfrekvens   f_k = rpm / 60
-tændingsfrekvens  f_t = f_k * cylindre / 2
-```
-
-Demoens bil har en trecylindret motor, så tændingsfrekvensen er 1,5 gange krumtapfrekvensen:
-
-| Omdrejningstal | Krumtapfrekvens f_k | Tændingsfrekvens f_t |
+| Recording | Estimated by the code | Rev counter |
 |---|---|---|
-| 900 omdr./min. (tomgang) | 15 Hz | 22,5 Hz |
-| 2500 omdr./min. | 41,7 Hz | 62,5 Hz |
+| Idle | 905 rpm | 900 rpm |
+| Revved | 2545 rpm | approx. 2500 rpm |
 
-Tændingerne er korte stød med jævne mellemrum, altså et periodisk signal. Ifølge Fourierrækken består det af toppe ved f = m · f_t, dvs. tændingsfrekvensen og dens harmoniske.
+This is the first of three planned projects. It is a **measurement, not a diagnosis**.
 
-En trecylindret rækkemotor har desuden en indbygget ubalance ved f_k. Den ligger dog så lavt, at telefonens mikrofon næppe kan høre den.
+---
 
-## Første resultat
-<img width="777" height="587" alt="image" src="https://github.com/user-attachments/assets/32771243-70b4-4e73-ad58-9c8532847cf4" />
+## 1. Motivation
 
-Tomgangsoptagelsen viser en række toppe med ca. 22,5 Hz imellem, fra 67,5 Hz op til 450 Hz. Fx ligger den 4. harmoniske ved 90,3 Hz, hvilket svarer til ca. 903 omdr./min. Havde i første omgang aflæst omdrejningstallet forkert til 750 med varm motor.
+My background is in audiology, followed by master's level courses in engineering acoustics at DTU, and later software development. Sound has always been the thread running through it.
 
-Analysen forudsagde dog en tomgang på ca. 900 omdr./min. ud fra lyden alene. Omdrejningstælleren bekræftede efterfølgende 900 omdr./min. med varm motor.
+This project started as a way to revisit DTU course 30160 (signal analysis) properly, not just reading the textbook again, but using it on something real. A car engine is a good test case: it is a periodic sound source, the physics behind its frequencies is simple and well known, and the result can be checked independently with the rev counter. If the theory is right, the spectrum should show it.
 
-Sammenligning med støjoptagelsen viser, at alle de skarpe toppe kommer fra bilen, og motorens støjgulv ligger omkring 300 Hz+. Toppene ved ca. 19,4 og 39,5 Hz passer ikke ind i rækken og ser ud til at have en anden kilde i bilen. Optagelsen ved 2500 omdr./min. skal vise, om de følger motoren.
+Building it also meant turning the theory into a small, clean code base, where every class has one job and every step can be tested with signals where the answer is known in advance.
 
-## Metode
+---
 
-1. Indlæs optagelsen
-2. Del den i stykker på 5 s (Welch)
-3. Læg et Hanning-vindue på hvert stykke
-4. FFT af hvert stykke
-5. Frekvensakse ud fra samplefrekvens og antal samples
-6. Skalér, så toppene viser den rigtige amplitude
-7. Tag gennemsnittet af effekten over stykkerne
-8. Find toppe og kobl dem til motorens forventede frekvenser
+## 2. Theory
 
-## Overvejelser og valg
+### 2.1 The engine as a sound source
 
-| Valg | Begrundelse |
+In a four-stroke engine each cylinder fires once every second revolution. With $c$ cylinders firing evenly:
+
+$$f_k = \frac{\text{rpm}}{60} \qquad\qquad f_t = f_k \cdot \frac{c}{2}$$
+
+$f_k$ is the crankshaft frequency and $f_t$ the firing frequency. For three cylinders $f_t = 1.5 \cdot f_k$, so
+
+$$\text{rpm} = f_t \cdot 60 \cdot \frac{2}{3} = 40 \cdot f_t$$
+
+| Engine speed | $f_k$ | $f_t$ |
+|---|---|---|
+| 900 rpm (idle) | 15 Hz | 22.5 Hz |
+| 2500 rpm | 41.7 Hz | 62.5 Hz |
+
+### 2.2 Why the spectrum has harmonics
+
+Each firing is a short pressure pulse, so the engine produces a periodic pulse train. By the Fourier series, a signal with period $T_0$ only contains frequencies at multiples of $f_0 = 1/T_0$:
+
+$$f = m \cdot f_0, \qquad m = 1, 2, 3, \dots$$
+
+For the engine, $f_0 = f_t$, so the spectrum shows peaks at $f_t, 2f_t, 3f_t, \dots$
+
+**Half orders.** If all three cylinders sounded exactly alike, only these peaks would appear. In practice they differ slightly (compression, fuel, combustion), so the pattern only repeats after a full engine cycle of two revolutions. That adds peaks at multiples of the half order $f_k/2$. They become clearer at higher engine speed, where the combustions are stronger.
+
+### 2.3 From samples to spectrum
+
+The recording is sampled at $f_s = 48\,000$ Hz. A recording of $N$ samples lasts $T = N/f_s$. The discrete Fourier transform
+
+$$F(m) = \sum_{n=0}^{N-1} f(n)\, e^{-j\frac{2\pi}{N}mn}$$
+
+gives lines spaced $f_0 = 1/T$ apart, and a baseband from 0 to $f_s/2$. Two choices matter:
+
+- **Hanning window.** The DFT treats the recording as if it repeats. Unless it contains a whole number of engine periods, there is a jump where the end meets the start, which smears energy into neighbouring frequencies (leakage). The Hanning window tapers both ends to zero. The price is a wider main peak.
+- **Welch averaging.** The recording is split into 5 s pieces ($f_0 = 0.2$ Hz), each piece gets its own spectrum, and the power is averaged. Noise is random and averages towards a smooth floor, while the engine's peaks are in every piece and stay. The floor's fluctuations shrink by about $1/\sqrt{K}$ for $K$ pieces.
+
+Amplitudes are scaled so a sine with amplitude $A$ shows as $A$, independent of recording length and window:
+
+$$A_m = \frac{2\,|F(m)|}{N \cdot \bar{w}}$$
+
+where $\bar{w}$ is the window's mean.
+
+### 2.4 Decibels
+
+Levels are shown in dB relative to full scale (dBFS). Decibel is defined for power, and power is amplitude squared:
+
+$$L = 10\log_{10}\!\left(\frac{A^2}{A_{ref}^2}\right) = 20\log_{10}\!\left(\frac{A}{A_{ref}}\right), \qquad A_{ref} = 1$$
+
+A factor 10 in amplitude is always 20 dB, so weak and strong peaks can be compared in the same plot.
+
+### 2.5 Noise floor and peaks
+
+The noise floor is not flat: the phone's microphone is weak below about 100 Hz, so the floor rises at low frequencies. It is estimated with a **running median** over 10 Hz. The median ignores narrow peaks as long as they fill less than half of the window, and follows slower changes in the floor.
+
+Each line is then measured in dB above the floor, much like an audiogram in dB HL uses normal hearing at each frequency as its reference. A peak must be a local maximum at least **8 dB above the floor**, and peaks must be at least 2 Hz apart.
+
+### 2.6 Finding the engine speed: a harmonic comb
+
+The code tries candidate firing frequencies in steps of 0.01 Hz. For each candidate it counts how many peaks lie within 0.5 Hz of a tooth $m \cdot f_t$. The candidate that hits most peaks wins. Each matched peak then gives its own estimate $f_{peak}/m$, and their mean is the final $f_t$.
+
+**The expected range.** A comb at $f_t/2$ or $f_t/3$ hits every tooth of the real comb as well. From the peaks alone, the code cannot tell which order it has found (an octave error). The user therefore gives a rough expected range, for example idle or revved. For three cylinders the crankshaft order sits at $\tfrac{2}{3} f_t$, so to exclude it safely:
+
+$$\frac{\text{rpm}_{max}}{\text{rpm}_{min}} < 1.5$$
+
+---
+
+## 3. Results
+
+![Idle](docs/idle.png)
+
+![Revved](docs/revved.png)
+
+**How to read the plots.** The blue line is the spectrum, the dashed line the noise floor, the grey dotted lines the comb teeth $m \cdot f_t$, and the red dots the peaks the code assigned to the engine.
+
+### What the results show
+
+- **Idle.** Peaks at 67.8, 90.6, 158.2 and 203.8 Hz, the 3rd, 4th, 7th and 9th harmonics of $f_t = 22.62$ Hz. That gives 905 rpm against 900 on the rev counter.
+- **Revved.** Seven harmonics in a row from 63.6 Hz, $f_t = 63.61$ Hz, giving 2545 rpm against about 2500.
+- **The pattern scales with engine speed.** The same structure appears in both recordings, stretched by the ratio of the engine speeds.
+- **The comb ignores what does not fit.** At idle, the strong peak at 19.8 Hz is left out because it is not on a tooth. When revved, the strong peaks between the teeth are half orders and are left out as well.
+- **The microphone matters.** At idle the fundamental at 22.6 Hz is missing, because it is below what the phone hears well. When revved, the fundamental at 63.6 Hz is visible.
+
+### What the results do not show
+
+- **Engine health.** There is no sign of a fault, but there is no reference either. Without recordings of this engine known to be healthy, and data with known faults, the code cannot say what is normal.
+- **The source of the 19.8 Hz peak.** It is only present at idle and does not follow the engine speed in an obvious way.
+- **Precise absolute levels.** dBFS depends on the phone, its placement and possible automatic gain. Levels can be compared within this setup, not with other setups.
+- **Generality.** One car, one phone, two engine speeds. The method is general, the settings are tuned to these recordings.
+
+### Known limitations
+
+| Limitation | Effect |
 |---|---|
-| **Hanning-vindue** | Motorlyden har komponenter spredt over hele spektret. Hanning giver lav lækage langt fra de kraftige toppe. Prisen er en bredere hovedtop. |
-| **Welch med stykker på 5 s** | Midling over flere stykker gør støjgulvet jævnt, så motorens toppe står tydeligt frem. 5 s giver f₀ = 1/T = 0,2 Hz, som er rigeligt, fordi motorens toppe selv er ca. 0,5 Hz brede. |
-| **48 kHz samplerate** | Basebåndet går til 24 kHz, langt over motorens interessante frekvenser. Lydkortets anti-aliasing-filter klarer resten. |
-| **Telefonmikrofon** | Bygget til tale og hører dårligt under ca. 50 til 100 Hz. Derfor ses motoren mest i de harmoniske, ikke i selve grundtonen. |
-| **Støjoptagelse som reference** | Toppe, der også findes uden motor, kommer ikke fra bilen. |
-| **Udendørs, fast placering** | Så tæt på frit felt som muligt, og samme opstilling i alle optagelser, så de kan sammenlignes. |
-| **Python** | numpy, scipy og matplotlib har det, signalbehandlingen kræver. Skal værktøjet videre til et produkt, er C# et naturligt valg. |
-| **Klasser med ét ansvar** | Hvert trin i signalbehandlingen er sin egen klasse. Vinduer, signalkilder og fejltyper ligger bag interfaces, så nye kan tilføjes uden at ændre det, der virker. |
-| **Kunstige testsignaler** | Hver klasse testes på signaler med kendte frekvenser, før der bruges rigtige optagelser. |
+| Phone microphone | Weak below about 100 Hz. The engine is seen mostly in its harmonics |
+| OGG recordings | Lossy compression. The highest frequencies are almost removed |
+| Expected range required | Too wide a range gives octave errors, for example 1696 instead of 2545 rpm |
+| Peaks at 4, 8 and 10 kHz | Round numbers, most likely from the phone or app, not the engine |
+| Rev counter | Analogue needle, read by eye |
 
-## Data
+---
 
-Optagelserne ligger i `data/` og er ikke med i git. Optaget med telefon, Audio Recorder, Hyundai i10 med trecylindret motor:
+## 4. Next steps
 
-| Fil | Indhold |
-|---|---|
-| `01_stoej.ogg` | Omgivelserne uden motor, reference |
-| `02_tomgang_900rpm.ogg` | Tomgang, ca. 900 omdr./min. |
-| `03_2500rpm.ogg` | Ca. 2500 omdr./min., med op- og nedgang i enderne |
-| `04_svingende_1000_2000rpm.ogg` | Varierende mellem 1000 og 2000 omdr./min. |
+- **Tests** in `tests/` with synthetic signals, so pytest checks every class.
+- **OperatingContext**, a small class holding the expected range, as in the class diagram.
+- **Penalty for missing teeth** in the comb, to reduce the need for an expected range.
+- **Overlap in Welch** (50 %), giving almost twice as many pieces and a smoother floor.
+- **Spectrogram** of the recording with varying engine speed, showing the peaks move over time.
+- **WAV or FLAC recordings**, and a microphone with better low-frequency response.
+- **Diagnosis at idle** (project 2): reference recordings of a healthy engine and data with known faults, for example compared with the car's OBD log.
+- **Diagnosis while driving** (project 3): wheels, bearings and gearbox, where the frequencies change over time.
 
-Demoens optagelser er gemt som **OGG**, dvs. komprimeret med tab. Kraftige toner som tændingsfrekvensen bevares, men svage detaljer og høje frekvenser kan være påvirket. Fremtidige optagelser laves i WAV eller FLAC.
+---
 
-## Kom i gang
+## Project structure
+
+```
+src/bilscanner/
+├── models/       data classes: Signal, Spectrum, Peak, EngineModel
+├── sources/      where signals come from: AudioLoader, SignalGenerator
+├── analysis/     window, spectrum, Welch, noise floor, peaks, comb
+├── plotting/     Plotter
+└── carScanner.py the whole chain in one call
+scripts/          check scripts and the demo
+```
+
+## Running the demo
 
 ```
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 pip install -e .
-pytest
+python scripts/demo.py
 ```
 
-Tjek-scripts køres fra roden, fx `python scripts/check_recording.py`.
-
-## Videre arbejde
-
-1. **Demo:** måling af tændingsfrekvens og harmoniske i tomgang
-2. **Diagnose i tomgang:** fejlsignaturer, fx ventiltik ved knastakslens frekvens, kræver en reference og data med kendte fejl
-3. **Diagnose under kørsel:** hjul, lejer og gearkasse, hvor frekvenserne ændrer sig over tid
+The recordings are in `data/` and are not part of the repository.
