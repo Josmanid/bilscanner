@@ -5,6 +5,7 @@ Kør fra roden:
 
 Forventet: ca. 22,6 Hz og ca. 905 omdr./min. Tælleren viste 900.
 """
+import matplotlib.pyplot as plt
 
 from bilscanner.sources.loader import AudioLoader
 from bilscanner.analysis.window import HanningWindow
@@ -13,7 +14,7 @@ from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
 from bilscanner.analysis.noiseFloorEstimator import NoiseFloorEstimator
 from bilscanner.analysis.peakDetector import PeakDetector
 from bilscanner.analysis.engineEstimator import EngineEstimator
-
+from bilscanner.plotting.plotter import Plotter
 # 1. Indlæs optagelsen
 signal = AudioLoader().load("data/02_tomgang_900rpm.ogg")
 
@@ -33,3 +34,7 @@ engine = EngineEstimator(cylinders=3).estimate(peaks, rpm_min=600, rpm_max=1200)
 print("Tændingsfrekvens:", round(engine.firing_frequency, 2), "Hz")
 print("Omdrejningstal:  ", round(engine.revolutions_per_minute), "omdr./min.")
 print("Motorens toppe:  ", [round(p.frequency, 1) for p in engine.matched_peaks])
+
+# 6. plot
+Plotter().plot(spectrum, floor, engine, title="Tomgang")
+plt.show()
