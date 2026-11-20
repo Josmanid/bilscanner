@@ -1,9 +1,7 @@
-"""Tjekker SignalGenerator.sine med motorens forventede tændingsfrekvens.
+"""Generates a 5 s sine at 18.75 Hz and checks its basic properties.
 
-Kør fra roden af projektet:
-    python scripts/check_generator.py
-
-Facit: 240 000 samples, 48 000 Hz, 5,0 s og max-værdi 1,0.
+Expected: 240 000 samples, 48 000 Hz, 5.0 s and max value 1.0 (N = T * f_s).
+Run from the project root: python scripts/check_generator.py
 """
 
 from carscanner.sources.signalGenerator import SignalGenerator

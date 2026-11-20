@@ -1,9 +1,7 @@
-"""Trin 7: Estimér omdrejningstallet for tomgang ud fra lyden.
+"""Runs the full chain on the idle recording and estimates the engine speed.
 
-Kør fra roden:
-    python scripts/check_engine.py
-
-Forventet: ca. 22,6 Hz og ca. 905 omdr./min. Tælleren viste 900.
+Checks that the harmonic comb finds about 22.6 Hz and 905 rpm (rev counter: 900).
+Run from the project root: python scripts/check_engine.py
 """
 import matplotlib.pyplot as plt
 
@@ -16,7 +14,7 @@ from carscanner.analysis.peakDetector import PeakDetector
 from carscanner.analysis.engineEstimator import EngineEstimator
 from carscanner.plotting.plotter import Plotter
 # 1. Indlæs optagelsen
-signal = AudioLoader().load("data/02_tomgang_900rpm.ogg")
+signal = AudioLoader().load("data/02_idle_900rpm.ogg")
 
 # 2. Spektrum med Welch
 welch = WelchAnalyzer(analyzer=SpectrumAnalyzer(window=HanningWindow()), segment_duration=5)

@@ -1,3 +1,9 @@
+"""Compares idle and revved spectra in linear scale and dB, with lines at m * f_t.
+
+Shows that the same harmonic pattern stretches with engine speed (900 vs 2500 rpm).
+Run from the project root: python scripts/compare_rpm.py
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,20 +18,18 @@ loader = AudioLoader()
 analyzer = SpectrumAnalyzer(window=HanningWindow())
 
 # signals
-signal_900rpm = loader.load("data/02_tomgang_900rpm.ogg")
+signal_900rpm = loader.load("data/02_idle_900rpm.ogg")
 
-signal_2500rpm = loader.load("data/03_2500rpm.ogg")
-start = int(20*signal_2500rpm.fs)
-end = int(55*signal_2500rpm.fs)
-signal_2500rpm_cut = Signal(samples=signal_2500rpm.samples[start:end],fs=signal_2500rpm.fs)
+signal_2500rpm = loader.load("data/03_revved_2500rpm.ogg")
+start = int(20 * signal_2500rpm.fs)
+end = int(55 * signal_2500rpm.fs)
+signal_2500rpm_cut = Signal(samples=signal_2500rpm.samples[start:end], fs=signal_2500rpm.fs)
 
-welch = WelchAnalyzer(analyzer=analyzer,segment_duration=5)
+welch = WelchAnalyzer(analyzer=analyzer, segment_duration=5)
 
 # spectrums
 spectrum_900rpm = welch.analyse(signal_900rpm)
 spectrum_2500rpm_cut = welch.analyse(signal_2500rpm_cut)
-
-
 
 print("------------- plots -------------")
 
@@ -51,20 +55,18 @@ fig, (ax_lin, ax_db) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 # for plt. Navnene ændrer sig lidt: xlim bliver til set_xlim osv.
 
 # --- Øverst: lineær amplitude ---
-ax_lin.plot(spectrum_900rpm.frequencies, spectrum_900rpm.amplitudes, label="Tomgang 900 omdr./min.")
-ax_lin.plot(spectrum_2500rpm_cut.frequencies, spectrum_2500rpm_cut.amplitudes, label="2500 omdr./min.")
+ax_lin.plot(spectrum_900rpm.frequencies, spectrum_900rpm.amplitudes, label="Idle 900 rpm")
+ax_lin.plot(spectrum_2500rpm_cut.frequencies, spectrum_2500rpm_cut.amplitudes, label="Revved 2500 rpm")
 ax_lin.set_ylabel("Amplitude")
-ax_lin.set_title("Lineær skala")
-ax_lin.legend()
+ax_lin.set_title("Linear scale")
 
 # --- Nederst: decibel ---
-ax_db.plot(spectrum_900rpm.frequencies, db_900rpm, label="Tomgang 900 omdr./min.")
-ax_db.plot(spectrum_2500rpm_cut.frequencies, db_2500rpm, label="2500 omdr./min.")
+ax_db.plot(spectrum_900rpm.frequencies, db_900rpm, label="Idle 900 rpm")
+ax_db.plot(spectrum_2500rpm_cut.frequencies, db_2500rpm, label="Revved 2500 rpm")
 ax_db.set_ylim(-100, -40)  # fra lidt under støjgulvet til lidt over den højeste top
-ax_db.set_xlabel("Frekvens i Hz")
-ax_db.set_ylabel("Niveau i dBFS")
+ax_db.set_xlabel("Frequency (Hz)")
+ax_db.set_ylabel("Level (dBFS)")
 ax_db.set_title("Decibel")
-ax_db.legend()
 
 # Fælles x-akse, så den sættes kun én gang
 ax_db.set_xlim(0, 500)  # kun de lave frekvenser, hvor motorens ordener ligger
@@ -76,7 +78,7 @@ f_t_2500 = 254.4 / 4    # 63,6 Hz, 2500 omdr./min.
 # Lodrette stiplede linjer ved m * f_t, Fourierrækkens f = m * f_0.
 # Kun den første linje (m = 1) får et navn, ellers ville forklaringen
 # vise den samme tekst mange gange.
-for f_t, color, name in [(f_t_900, "C0", "tomgang"), (f_t_2500, "C1", "2500 omdr./min.")]:
+for f_t, color, name in [(f_t_900, "C0", "idle"), (f_t_2500, "C1", "revved")]:
     m = 1
     while m * f_t <= 500:
         label = f"f_t = {f_t:.1f} Hz ({name})" if m == 1 else None
@@ -88,6 +90,7 @@ for f_t, color, name in [(f_t_900, "C0", "tomgang"), (f_t_2500, "C1", "2500 omdr
 # de stiplede linjer ikke med
 ax_lin.legend()
 ax_db.legend()
+
 # Sørger for, at titler og akser ikke overlapper
 plt.tight_layout()
 plt.show()

@@ -1,24 +1,7 @@
-"""Test af Welch-midling.
+"""Compares one 5 s spectrum with Welch averaging over 6 pieces of a noisy 18.75 Hz sine.
 
-Spørgsmålet:
-    Gør Welch-midling støjgulvet jævnere, uden at ændre motorens toppe?
-
-Opsætning:
-    En sinus på 18,75 Hz med amplituden 1 (det deterministiske, det vi
-    vil finde) plus hvid støj med spredningen 0,5 (det tilfældige).
-
-To analyser med samme f0 = 0,2 Hz og samme vindue:
-    Uden Welch: ét stykke på 5 s
-    Med Welch:  30 s delt i 6 stykker á 5 s, midlet til ét spektrum
-    Den eneste forskel er midlingen, så vi måler effekten af den alene.
-
-Forventet:
-    Toppen ved 18,8 Hz med ca. 0,96 i begge.
-    Støjgulvet ca. 2,4 gange jævnere med Welch, fordi takkerne falder
-    med 1/sqrt(K) = 1/sqrt(6).
-
-Kør fra roden:
-    python scripts/check_welch.py
+Expected: same peak (18.8 Hz, about 0.96), noise floor about sqrt(6) = 2.4 times smoother.
+Run from the project root: python scripts/check_welch.py
 """
 
 import numpy as np
@@ -44,7 +27,7 @@ generator = SignalGenerator()
 # i det første stykke.
 
 def noisy_sine(duration: float) -> Signal:
-    """Sinus på F_TEST Hz plus hvid støj, i alt duration sekunder."""
+    """Sine at F_TEST Hz plus white noise, duration seconds in total."""
     sine = generator.sine(frequency=F_TEST, amplitude=1, duration=duration, fs=FS)
     noise = generator.white_noise(std=0.5, duration=duration, fs=FS, seed=0)
     # Læg de to signaler sammen sample for sample
@@ -84,16 +67,16 @@ std_welch = spectrum_welch.amplitudes[band].std()
 # ------------------------------------------------------------------
 # 4. Resultat
 # ------------------------------------------------------------------
-print("---------------- Uden Welch, ét stykke på 5 s ----------------")
-print("Toppen:             ", spectrum_single.frequencies[m_single], "Hz")
-print("Amplitude:          ", round(spectrum_single.amplitudes[m_single], 3))
-print("Spredning i gulvet: ", std_single)
+print("---------------- Without Welch, one 5 s piece ----------------")
+print("Peak:            ", spectrum_single.frequencies[m_single], "Hz")
+print("Amplitude:       ", round(spectrum_single.amplitudes[m_single], 3))
+print("Floor spread:    ", std_single)
 
-print("---------------- Med Welch, 6 stykker på 5 s -----------------")
-print("Toppen:             ", spectrum_welch.frequencies[m_welch], "Hz")
-print("Amplitude:          ", round(spectrum_welch.amplitudes[m_welch], 3))
-print("Spredning i gulvet: ", std_welch)
+print("---------------- With Welch, 6 pieces of 5 s -----------------")
+print("Peak:            ", spectrum_welch.frequencies[m_welch], "Hz")
+print("Amplitude:       ", round(spectrum_welch.amplitudes[m_welch], 3))
+print("Floor spread:    ", std_welch)
 
-print("---------------- Sammenligning -------------------------------")
-print("Gulvet er", round(std_single / std_welch, 2), "gange jævnere med Welch")
-print("Forventet ca.", round(np.sqrt(6), 2), "= sqrt(6)")
+print("---------------- Comparison ----------------------------------")
+print("The floor is", round(std_single / std_welch, 2), "times smoother with Welch")
+print("Expected about", round(np.sqrt(6), 2), "= sqrt(6)")
