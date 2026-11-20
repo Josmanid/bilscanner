@@ -22,10 +22,30 @@ This project started as a way to revisit DTU course 30160 (signal analysis) prop
 Building it also meant turning the theory into a small, clean code base, where every class has one job and every step can be tested with signals where the answer is known in advance.
 
 ---
+## 2. Measurement setup
 
-## 2. Theory
+| | |
+|---|---|
+| Car | Hyundai i10, three-cylinder four-stroke engine, stationary |
+| Recorder | Phone with the Audio Recorder app, 48 kHz, mono |
+| Placement | Outdoors, fixed position, the same for all recordings |
+| Reference | Engine speed read on the car's analogue rev counter |
 
-### 2.1 The engine as a sound source
+| File | Content | Length |
+|---|---|---|
+| `01_stoej.ogg` | Background noise, engine off | 30.5 s |
+| `02_tomgang_900rpm.ogg` | Idle, about 900 rpm | 31.0 s |
+| `03_2500rpm.ogg` | Revved to about 2500 rpm, stable from 20 to 55 s | 65.0 s |
+| `04_svingende_1000_2000rpm.ogg` | Varying between 1000 and 2000 rpm | 106.5 s |
+
+**A known compromise.** The recordings were saved as OGG instead of WAV. OGG is lossy, which mainly affects weak details and high frequencies. On top of that, the phone's microphone is weak below about 100 Hz. Both limitations were known before the analysis. The setup was kept on purpose: if the method works with an ordinary phone and compressed files, it shows that it is robust, and better equipment can only improve it.
+
+
+---
+
+## 3. Theory
+
+### 3.1 The engine as a sound source
 
 In a four-stroke engine each cylinder fires once every second revolution. With $c$ cylinders firing evenly:
 
@@ -40,7 +60,7 @@ $$\text{rpm} = f_t \cdot 60 \cdot \frac{2}{3} = 40 \cdot f_t$$
 | 900 rpm (idle) | 15 Hz | 22.5 Hz |
 | 2500 rpm | 41.7 Hz | 62.5 Hz |
 
-### 2.2 Why the spectrum has harmonics
+### 3.2 Why the spectrum has harmonics
 
 Each firing is a short pressure pulse, so the engine produces a periodic pulse train. By the Fourier series, a signal with period $T_0$ only contains frequencies at multiples of $f_0 = 1/T_0$:
 
@@ -50,7 +70,7 @@ For the engine, $f_0 = f_t$, so the spectrum shows peaks at $f_t, 2f_t, 3f_t, \d
 
 **Half orders.** If all three cylinders sounded exactly alike, only these peaks would appear. In practice they differ slightly (compression, fuel, combustion), so the pattern only repeats after a full engine cycle of two revolutions. That adds peaks at multiples of the half order $f_k/2$. They become clearer at higher engine speed, where the combustions are stronger.
 
-### 2.3 From samples to spectrum
+### 3.3 From samples to spectrum
 
 The recording is sampled at $f_s = 48\,000$ Hz. A recording of $N$ samples lasts $T = N/f_s$. The discrete Fourier transform
 
@@ -67,7 +87,7 @@ $$A_m = \frac{2\,|F(m)|}{N \cdot \bar{w}}$$
 
 where $\bar{w}$ is the window's mean.
 
-### 2.4 Decibels
+### 3.4 Decibels
 
 Levels are shown in dB relative to full scale (dBFS). Decibel is defined for power, and power is amplitude squared:
 
@@ -75,13 +95,13 @@ $$L = 10\log_{10}\!\left(\frac{A^2}{A_{ref}^2}\right) = 20\log_{10}\!\left(\frac
 
 A factor 10 in amplitude is always 20 dB, so weak and strong peaks can be compared in the same plot.
 
-### 2.5 Noise floor and peaks
+### 3.5 Noise floor and peaks
 
 The noise floor is not flat: the phone's microphone is weak below about 100 Hz, so the floor rises at low frequencies. It is estimated with a **running median** over 10 Hz. The median ignores narrow peaks as long as they fill less than half of the window, and follows slower changes in the floor.
 
 Each line is then measured in dB above the floor, much like an audiogram in dB HL uses normal hearing at each frequency as its reference. A peak must be a local maximum at least **8 dB above the floor**, and peaks must be at least 2 Hz apart.
 
-### 2.6 Finding the engine speed: a harmonic comb
+### 3.6 Finding the engine speed: a harmonic comb
 
 The code tries candidate firing frequencies in steps of 0.01 Hz. For each candidate it counts how many peaks lie within 0.5 Hz of a tooth $m \cdot f_t$. The candidate that hits most peaks wins. Each matched peak then gives its own estimate $f_{peak}/m$, and their mean is the final $f_t$.
 
@@ -91,7 +111,7 @@ $$\frac{\text{rpm}_{max}}{\text{rpm}_{min}} < 1.5$$
 
 ---
 
-## 3. Results
+## 4. Results
 
 ![Idle](docs/idle.png)
 
@@ -126,7 +146,7 @@ $$\frac{\text{rpm}_{max}}{\text{rpm}_{min}} < 1.5$$
 
 ---
 
-## 4. Next steps
+## 5. Next steps
 
 - **Tests** in `tests/` with synthetic signals, so pytest checks every class.
 - **OperatingContext**, a small class holding the expected range, as in the class diagram.
