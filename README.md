@@ -162,7 +162,7 @@ $$\frac{\text{rpm}_{max}}{\text{rpm}_{min}} < 1.5$$
 ## Project structure
 
 ```
-src/bilscanner/
+src/carscanner/
 ├── models/       data classes: Signal, Spectrum, Peak, EngineModel
 ├── sources/      where signals come from: AudioLoader, SignalGenerator
 ├── analysis/     window, spectrum, Welch, noise floor, peaks, comb

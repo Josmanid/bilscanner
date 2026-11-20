@@ -23,11 +23,11 @@ Kør fra roden:
 
 import numpy as np
 
-from bilscanner.models.signal import Signal
-from bilscanner.sources.signalGenerator import SignalGenerator
-from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
-from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
-from bilscanner.analysis.window import HanningWindow
+from carscanner.models.signal import Signal
+from carscanner.sources.signalGenerator import SignalGenerator
+from carscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
+from carscanner.analysis.welchAnalyzer import WelchAnalyzer
+from carscanner.analysis.window import HanningWindow
 
 FS = 48000          # samplefrekvens i Hz, samme som optagelserne
 F_TEST = 18.75      # tændingsfrekvens: 750/60 * 3/2

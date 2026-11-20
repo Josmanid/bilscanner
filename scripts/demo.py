@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from bilscanner.carScanner import CarScanner
+from carscanner.carScanner import CarScanner
 
 scanner = CarScanner()
 

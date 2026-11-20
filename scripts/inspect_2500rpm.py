@@ -4,8 +4,8 @@ Formål: Finde intervallet i tid, hvor motoren er i 2500 omdrejninger
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bilscanner.sources.loader import AudioLoader
-from bilscanner.models.signal import Signal
+from carscanner.sources.loader import AudioLoader
+from carscanner.models.signal import Signal
 
 loader = AudioLoader()
 

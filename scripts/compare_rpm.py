@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bilscanner.sources.loader import AudioLoader
-from bilscanner.models.signal import Signal
-from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
-from bilscanner.analysis.window import HanningWindow
-from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
+from carscanner.sources.loader import AudioLoader
+from carscanner.models.signal import Signal
+from carscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
+from carscanner.analysis.window import HanningWindow
+from carscanner.analysis.welchAnalyzer import WelchAnalyzer
 
 loader = AudioLoader()
 

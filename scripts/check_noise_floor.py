@@ -2,12 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bilscanner.sources.loader import AudioLoader
-from bilscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
-from bilscanner.analysis.window import HanningWindow
-from bilscanner.analysis.welchAnalyzer import WelchAnalyzer
-from bilscanner.analysis.noiseFloorEstimator import NoiseFloorEstimator
-from bilscanner.analysis.peakDetector import PeakDetector
+from carscanner.sources.loader import AudioLoader
+from carscanner.analysis.spectrumAnalyzer import SpectrumAnalyzer
+from carscanner.analysis.window import HanningWindow
+from carscanner.analysis.welchAnalyzer import WelchAnalyzer
+from carscanner.analysis.noiseFloorEstimator import NoiseFloorEstimator
+from carscanner.analysis.peakDetector import PeakDetector
 
 loader = AudioLoader()
 

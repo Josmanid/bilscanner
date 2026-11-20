@@ -1,4 +1,4 @@
-from bilscanner.sources.loader import AudioLoader
+from carscanner.sources.loader import AudioLoader
 
 loader = AudioLoader() # laver et nyt objekt på heapen ligesom C#
 
