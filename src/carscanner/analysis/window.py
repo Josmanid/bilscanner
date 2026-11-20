@@ -1,13 +1,12 @@
-"""Trin 3: Vinduer.
+"""Step 3: Windows.
 
-Teori (afsnit 6.4 og lektion 6): FFT'en antager, at optagelsen
-gentager sig. Passer den ikke til et helt antal perioder, opstår et
-spring, hvor slutningen møder begyndelsen, og det giver lækage i
-spektret. Et vindue nedtoner optagelsen mod begge ender, så springet
-forsvinder.
+Theory: the FFT assumes the recording repeats. Unless it contains a whole
+number of periods, there is a jump where the end meets the start, which
+causes leakage in the spectrum. A window tapers the recording towards both
+ends, so the jump disappears.
 
-Her lægges vinduet på samplene i tid. I bogens afsnit 6.4 lægges det
-på koefficienterne i frekvens. Det er den spejlvendte brug.
+Here the window is applied to the samples in time. In the textbook's
+section 6.4 it is applied to the coefficients in frequency, the mirrored use.
 """
 
 from abc import ABC, abstractmethod
@@ -18,10 +17,10 @@ from ..models.signal import Signal
 
 
 class Window(ABC):
-    """Interface for alle vinduer, svarende til et interface i C#.
+    """Interface for all windows, like an interface in C#.
 
-    @abstractmethod betyder, at alle klasser, der arver fra Window,
-    skal have en apply_to. Glemmer de den, giver Python en fejl.
+    @abstractmethod means every class inheriting from Window must have
+    an apply_to. If it is missing, Python raises an error.
     """
 
     @abstractmethod
@@ -31,10 +30,9 @@ class Window(ABC):
 
 
 class RectangularWindow(Window):
-    """Intet vindue: ganger med 1 overalt.
+    """No window: multiplies by 1 everywhere.
 
-    Bruges til at sammenligne med Hanning, så man kan se,
-    hvor meget lækage vinduet fjerner.
+    Used for comparison with Hanning, to see how much leakage the window removes.
     """
 
     def apply_to(self, signal: Signal) -> Signal:
@@ -45,11 +43,11 @@ class RectangularWindow(Window):
 
 
 class HanningWindow(Window):
-    """Hanning-vindue: går fra 0 op til 1 i midten og ned til 0 igen.
+    """Hanning window: rises from 0 to 1 in the middle and back to 0.
 
-    Fordi det ender i 0 i begge ender, er der intet spring tilbage,
-    når FFT'en gentager optagelsen. Det giver lav lækage langt fra
-    de kraftige toppe. Prisen er en bredere hovedtop.
+    Because it ends at 0 at both ends, there is no jump when the FFT repeats
+    the recording. This gives low leakage far from strong peaks, at the cost
+    of a wider main peak.
     """
 
     def apply_to(self, signal: Signal) -> Signal:

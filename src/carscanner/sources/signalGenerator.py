@@ -1,3 +1,5 @@
+"""Creates synthetic test signals with known frequencies, amplitudes and noise."""
+
 import numpy as np
 from ..models.signal import Signal
 
@@ -9,13 +11,13 @@ class SignalGenerator:
         duration: float, 
         fs: float
     ) -> Signal:
-        """En ren sinus med kendt frekvens og amplitude.
+        """A pure sine with known frequency and amplitude.
 
-        Parametre:
-            frequency: frekvensen f i Hz
-            amplitude: højden A
-            duration:  længden T i sekunder
-            fs:        samplefrekvensen f_s i Hz
+        Parameters:
+            frequency: frequency f in Hz
+            amplitude: amplitude A
+            duration:  length T in seconds
+            fs:        sample rate f_s in Hz
         """
         # Skridt 1: Hvor mange samples?
         # T = N * T_s vendt om giver N = T * f_s (formel 7.2).
@@ -39,24 +41,24 @@ class SignalGenerator:
         duration: float,
         fs: float,
     ) -> Signal:
-        """En sum af harmoniske sinusser, ligesom en Fourierrække.
+        """A sum of harmonic sines, like a Fourier series.
 
-        Den m'te harmoniske ligger ved m * f_0 og har amplituden A_m:
-            f(n) = sum over m af A_m * sin(2 pi m f_0 n T_s)   (afsnit 6.1)
+        The m-th harmonic lies at m * f_0 with amplitude A_m:
+            f(n) = sum over m of A_m * sin(2 pi m f_0 n T_s)   (section 6.1)
 
-        Generatoren ved intet om motoren. Det er den, der kalder metoden,
-        der vælger grundfrekvens og amplituder.
+        The generator knows nothing about the engine. The caller chooses
+        the fundamental and the amplitudes.
 
-        Parametre:
-            fundamental: grundfrekvensen f_0 i Hz
-            amplitudes:  liste med A_1, A_2, A_3, ... Første tal hører til
-                         1 * f_0, andet til 2 * f_0 osv. 0 betyder, at den
-                         harmoniske ikke er med.
-            duration:    længden T i sekunder
-            fs:          samplefrekvensen f_s i Hz
+        Parameters:
+            fundamental: fundamental frequency f_0 in Hz
+            amplitudes:  list of A_1, A_2, A_3, ... The first value belongs
+                         to 1 * f_0, the second to 2 * f_0, and so on.
+                         0 means the harmonic is left out.
+            duration:    length T in seconds
+            fs:          sample rate f_s in Hz
 
-        Eksempel: fundamental=6.25 og amplitudes=[0, 0.5, 1.0, 0, 0, 0.3]
-        giver 12,5 Hz med 0,5, 18,75 Hz med 1,0 og 37,5 Hz med 0,3.
+        Example: fundamental=6.25 and amplitudes=[0, 0.5, 1.0, 0, 0, 0.3]
+        gives 12.5 Hz at 0.5, 18.75 Hz at 1.0 and 37.5 Hz at 0.3.
         """
         # Skridt 1: Antal samples, N = T * f_s (formel 7.2)
         N = self._num_samples(duration,fs)
@@ -81,7 +83,7 @@ class SignalGenerator:
         return Signal(samples=total, fs=fs)
     
     def _num_samples(self, duration: float, fs: float) -> int:
-        """Antal samples, N = T * f_s (formel 7.2)."""
+        """Number of samples, N = T * f_s (formula 7.2)."""
         return int(duration * fs)
 
     def white_noise(
@@ -91,14 +93,15 @@ class SignalGenerator:
         fs: float,
         seed: int | None = None,
     ) -> Signal:
-        """Hvid støj
-        Parametre:
-            std:      spredningen, altså hvor kraftig støjen er
-            duration: længden T i sekunder
-            fs:       samplefrekvensen f_s i Hz
-            seed:     startværdi for tilfældighederne. Samme seed giver
-                      samme støj hver gang, så en test kan gentages.
-                      None giver ny støj hver gang.
+        """White noise: random samples with a flat spectrum.
+
+        Parameters:
+            std:      standard deviation, how strong the noise is
+            duration: length T in seconds
+            fs:       sample rate f_s in Hz
+            seed:     start value for the random generator. The same seed
+                      gives the same noise every time, so a test can be
+                      repeated. None gives new noise every time.
         """
         # Skridt 1: Antal samples, N = T * f_s (formel 7.2)
         N = self._num_samples(duration, fs)

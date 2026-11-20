@@ -1,25 +1,24 @@
-"""Trin 5: Støjgulvet.
+"""Step 5: The noise floor.
 
-Input:  et Spectrum, typisk fra WelchAnalyzer
-Output: støjgulvet som et nyt Spectrum med samme frekvenser
+Input:  a Spectrum, typically from WelchAnalyzer
+Output: the noise floor as a new Spectrum with the same frequencies
 
-Idé:
-    Gulvet er den brede baggrund, som motorens toppe står på. Det er
-    ikke fladt: under ca. 150 Hz stiger det, fordi telefonmikrofonen
-    hører dårligt de laveste frekvenser. Derfor skal gulvet findes
-    frekvens for frekvens, ikke som ét fast niveau.
+Idea:
+    The floor is the broad background the engine's peaks stand on. It is
+    not flat: below about 150 Hz it rises, because the phone's microphone
+    is weak at the lowest frequencies. The floor is therefore found
+    frequency by frequency, not as one fixed level.
 
-Metode, glidende median:
-    For hver streg tages medianen af nabostregerne i et vindue.
-    Medianen er den midterste værdi, når de sorteres. Toppene er høje
-    og smalle og havner i den ene ende af sorteringen, så medianen
-    ser gennem dem og finder gulvet. Et glidende gennemsnit ville
-    derimod blive trukket op af toppene.
+Method, running median:
+    For each line, the median of the neighbouring lines in a window is
+    taken. Peaks are high and narrow and end up at one end of the sorted
+    values, so the median sees through them and finds the floor. A running
+    mean would be pulled up by the peaks.
 
-Brug:
-    Bagefter måles hver streg som dB over gulvet. Så ligger gulvet
-    omkring 0 dB ved alle frekvenser, ligesom normal hørelse i et
-    audiogram i dB HL, og trin 6 kan bruge én regel for toppene.
+Use:
+    Each line is then measured in dB above the floor. The floor lies
+    around 0 dB at all frequencies, like normal hearing in an audiogram
+    in dB HL, so step 6 can use one rule for the peaks.
 """
 
 from scipy.ndimage import median_filter
@@ -28,7 +27,7 @@ from ..models.spectrum import Spectrum
 
 
 class NoiseFloorEstimator:
-    """Finder støjgulvet i et spektrum med en glidende median."""
+    """Finds the noise floor of a spectrum with a running median."""
 
     def __init__(self, window_hz: float = 10):
         # Medianvinduets bredde i Hz.

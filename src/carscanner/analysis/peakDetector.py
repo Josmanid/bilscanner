@@ -1,10 +1,10 @@
-"""Trin 6: Find toppene i et spektrum.
+"""Step 6: Find the peaks in a spectrum.
 
-En streg er en top, hvis den:
-    1. ligger mindst threshold_db over støjgulvet, og
-    2. er højere end sine naboer, altså en lokal top.
-Regel 2 sikrer, at én top kun tælles én gang, selv om Hanning gør
-hovedtoppen ca. 4 streger bred.
+A line is a peak if it:
+    1. lies at least threshold_db above the noise floor, and
+    2. is higher than its neighbours, a local maximum.
+Rule 2 makes sure each peak is counted once, even though the Hanning
+window makes the main peak about 4 lines wide.
 """
 
 import numpy as np
@@ -15,7 +15,7 @@ from ..models.spectrum import Spectrum
 
 
 class PeakDetector:
-    """Finder toppe, der stikker tydeligt op over støjgulvet."""
+    """Finds peaks that stand clearly above the noise floor."""
 
     def __init__(self, threshold_db: float = 8, min_distance_hz: float = 2.0):
         # Hvor mange dB over gulvet en top mindst skal ligge

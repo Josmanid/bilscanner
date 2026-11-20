@@ -1,15 +1,15 @@
-"""Trin 7: Estimér tændingsfrekvens og omdrejningstal ud fra toppene.
+"""Step 7: Estimate firing frequency and engine speed from the peaks.
 
-Idé, en harmonisk kam:
-    Motorens toppe ligger ved m * f_t (Fourierrækken, f = m * f0).
-    Vi prøver mange bud på f_t og tæller for hvert bud, hvor mange af
-    de målte toppe der ligger tæt på en tand m * f_t. Det bud, der
-    rammer flest, er tændingsfrekvensen.
+Harmonic comb:
+    The engine's peaks lie at m * f_t (Fourier series, f = m * f0).
+    Candidate values of f_t are tried, and for each one the code counts
+    how many measured peaks lie close to a tooth m * f_t. The candidate
+    with the most hits is the firing frequency.
 
-Hvorfor et forventet område:
-    En kam med det halve eller en tredjedel af f_t rammer også alle
-    toppene. Ved kun at lede inden for et forventet område, fx tomgang
-    600-1200 omdr./min., udelukkes de.
+Why an expected range:
+    A comb at half or a third of f_t also hits every peak (octave error).
+    Searching only within an expected range, for example 600-1200 rpm
+    at idle, rules those out. For three cylinders: rpm_max / rpm_min < 1.5.
 """
 
 import numpy as np
@@ -19,7 +19,7 @@ from ..models.peak import Peak
 
 
 class EngineEstimator:
-    """Estimerer tændingsfrekvens og omdrejningstal ud fra spektrets toppe."""
+    """Estimates firing frequency and engine speed from the spectrum's peaks."""
 
     def __init__(
         self,
@@ -73,7 +73,7 @@ class EngineEstimator:
 
         # Ramte intet bud en eneste top, kan motoren ikke findes
         if best_candidate is None:
-            raise ValueError("Ingen toppe passer med en tændingsfrekvens i det forventede område.")
+                raise ValueError("No peaks match a firing frequency in the expected range.")
 
         # Skridt 4: Finjustér f_t ud fra de toppe, der ramte.
         # Nabobud som 22,55 og 22,65 Hz rammer ofte de samme toppe, så det

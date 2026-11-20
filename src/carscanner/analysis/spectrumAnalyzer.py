@@ -1,9 +1,21 @@
+"""Step 4: From a Signal in time to a Spectrum in frequency.
+
+Applies the window, takes the FFT of the real signal (positive half only)
+and scales the amplitudes so a sine with amplitude A shows as A:
+
+    A_m = 2 * |F(m)| / (N * w_mean)
+
+The factor 2 adds the missing negative half, N removes the dependence on
+the recording length, and w_mean corrects for the window's damping.
+"""
+
 import numpy as np
 from .window import Window
 from ..models.signal import Signal
 from ..models.spectrum import Spectrum
 
 class SpectrumAnalyzer:
+    """Turns a Signal into a one-sided amplitude Spectrum using a given window."""
     def __init__(self, window: Window):
         self.window = window
 

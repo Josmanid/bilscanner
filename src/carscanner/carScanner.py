@@ -1,12 +1,12 @@
-"""CarScanner: hele kæden i ét kald.
+"""CarScanner: the whole chain in one call.
 
-Facade-mønstret: én enkel indgang foran mange klasser. Den, der bruger
-CarScanner, behøver ikke vide, at der findes en Welch-analysator,
-en støjgulvsestimator osv. Indstillingerne er dem, der er fundet
-til at virke på optagelserne af Hyundai i10'eren.
+Facade pattern: one simple entry point in front of many classes. The user
+of CarScanner does not need to know about the Welch analyzer, the noise
+floor estimator and so on. The settings are the ones found to work on the
+recordings of the Hyundai i10.
 
-Kæden:
-    fil -> Signal -> Welch-spektrum -> støjgulv -> toppe -> kam -> plot
+The chain:
+    file -> Signal -> Welch spectrum -> noise floor -> peaks -> comb -> plot
 """
 
 from matplotlib.figure import Figure
@@ -24,7 +24,7 @@ from .sources.loader import AudioLoader
 
 
 class CarScanner:
-    """Finder motorens omdrejningstal i en lydoptagelse og tegner resultatet."""
+    """Finds the engine speed in a sound recording and plots the result."""
 
     def __init__(self, cylinders: int = 3):
         # Alle værktøjer laves én gang med de indstillinger, der virker.
@@ -51,21 +51,21 @@ class CarScanner:
         start_s: float | None = None,
         end_s: float | None = None,
     ) -> tuple[EngineModel, Figure]:
-        """Kører hele kæden på én optagelse.
+        """Runs the whole chain on one recording.
 
-        Parametre:
-            path:     stien til lydfilen
-            rpm_min:  laveste forventede omdrejningstal
-            rpm_max:  højeste forventede omdrejningstal
-                      Området udelukker oktavfejl, fx at den halve orden
-                      bliver regnet som tændingsfrekvensen.
-            title:    titel på plottet
-            start_s:  valgfri start på det stykke, der analyseres, i sekunder
-            end_s:    valgfri slut på stykket, i sekunder
+        Parameters:
+            path:     path to the audio file
+            rpm_min:  lowest expected engine speed
+            rpm_max:  highest expected engine speed
+                      The range rules out octave errors, for example the
+                      half order being taken as the firing frequency.
+                      For three cylinders: rpm_max / rpm_min < 1.5.
+            title:    plot title
+            start_s:  optional start of the analysed part, in seconds
+            end_s:    optional end of the analysed part, in seconds
 
-        Returnerer:
-            motorens resultat og figuren. tuple betyder, at to ting
-            returneres på én gang, ligesom (EngineModel, Figure) i C#.
+        Returns:
+            the engine result and the figure, as a tuple of two values.
         """
         # 1. Indlæs optagelsen
         signal = self.loader.load(path)

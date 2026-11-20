@@ -1,14 +1,14 @@
-"""Welch-midling: et jævnere spektrum ved at tage gennemsnittet af flere.
+"""Welch averaging: a smoother spectrum by averaging several.
 
-Idé:
-    Støj er tilfældig og forskellig i hvert stykke af optagelsen.
-    Motorens toppe er deterministiske og ligger samme sted i hvert stykke.
-    Tager man gennemsnittet af spektrene, bliver støjgulvet jævnt,
-    mens toppene står tilbage.
+Idea:
+    Noise is random and different in each piece of the recording.
+    The engine's peaks are deterministic and sit in the same place in
+    every piece. Averaging the spectra makes the noise floor smooth,
+    while the peaks remain.
 
-Afvejning:
-    Kortere stykker giver større f0 = 1/T, altså grovere opløsning,
-    men flere spektre at tage gennemsnittet af.
+Trade-off:
+    Shorter pieces give a larger f0 = 1/T, so coarser resolution,
+    but more spectra to average.
 """
 
 import numpy as np

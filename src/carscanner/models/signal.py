@@ -11,7 +11,7 @@ class Signal:
     fs: float
 
     def duration(self) -> float:
-        """optagelsens længde i sekunder se formel (7.2) T = N / f_s"""
+        """Length of the recording in seconds, T = N / f_s (formula 7.2)."""
         N = len(self.samples) # samlede antal samples i hele optagelsen 
         T = N/self.fs
         return T
