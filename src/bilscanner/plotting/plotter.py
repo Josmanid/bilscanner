@@ -1,10 +1,10 @@
-"""Trin 8: Tegn resultatet.
+"""Step 8: Draw the result.
 
-Ét dB-plot med alt, der skal til for at forstå resultatet:
-    spektret, støjgulvet, motorens toppe og kammens tænder m * f_t.
+One dB plot with everything needed to understand the result:
+    the spectrum, the noise floor, the engine's peaks and the comb teeth m * f_t.
 
-Plotter regner ikke noget nyt. Den tegner kun det, de andre klasser
-har fundet, så tegning og beregning holdes adskilt.
+Plotter does not calculate anything new. It only draws what the other
+classes have found, keeping drawing and calculation separate.
 """
 
 import matplotlib.pyplot as plt
@@ -15,39 +15,39 @@ from ..models.spectrum import Spectrum
 
 
 class Plotter:
-    """Tegner spektrum, støjgulv, motorens toppe og kammens tænder."""
+    """Draws the spectrum, noise floor, engine peaks and comb teeth."""
 
     def __init__(self, max_hz: float = 500):
-        # Hvor langt op x-aksen går. Motorens toppe ses kun op til
-        # ca. 500 Hz med telefonens mikrofon.
+        # How far the x-axis goes. With the phone's microphone the engine's
+        # peaks are only visible up to about 500 Hz.
         self.max_hz = max_hz
 
     def _to_db(self, amplitudes: np.ndarray) -> np.ndarray:
-        """Fra amplitude til dBFS: L = 20 * log10(A / A_ref), A_ref = 1.
+        """From amplitude to dBFS: L = 20 * log10(A / A_ref), A_ref = 1.
 
-        1e-12 beskytter mod log10(0), som er minus uendelig.
-        Understregen foran navnet betyder: kun til brug inde i klassen.
+        1e-12 protects against log10(0), which is minus infinity.
+        The leading underscore means: for use inside the class only.
         """
         return 20 * np.log10(amplitudes + 1e-12)
 
     def plot(self, spectrum: Spectrum, floor: Spectrum, engine: EngineModel, title: str):
-        """Tegner ét dB-plot og returnerer figuren.
+        """Draws one dB plot and returns the figure.
 
-        Figuren returneres i stedet for at blive vist med det samme,
-        så den, der kalder, selv vælger at vise den eller gemme den.
+        The figure is returned instead of shown right away, so the caller
+        decides whether to show it or save it.
         """
         db_spectrum = self._to_db(spectrum.amplitudes)
         db_floor = self._to_db(floor.amplitudes)
 
-        # fig er vinduet, ax er selve plottet
+        # fig is the window, ax is the plot itself
         fig, ax = plt.subplots(figsize=(10, 5))
 
-        # 1. Spektret og støjgulvet
-        ax.plot(spectrum.frequencies, db_spectrum, label="Spektrum (Welch)")
-        ax.plot(floor.frequencies, db_floor, linestyle="--", label="Støjgulv (median)")
+        # 1. Spectrum and noise floor
+        ax.plot(spectrum.frequencies, db_spectrum, label="Spectrum (Welch)")
+        ax.plot(floor.frequencies, db_floor, linestyle="--", label="Noise floor (median)")
 
-        # 2. Kammens tænder ved m * f_t, Fourierrækkens f = m * f0.
-        # Kun den første får et navn, så forklaringen ikke gentager sig.
+        # 2. Comb teeth at m * f_t, the Fourier series f = m * f0.
+        # Only the first line gets a label, so the legend does not repeat itself.
         f_t = engine.firing_frequency
         m = 1
         while m * f_t <= self.max_hz:
@@ -55,23 +55,23 @@ class Plotter:
             ax.axvline(m * f_t, color="gray", linestyle=":", alpha=0.5, label=label)
             m += 1
 
-        # 3. Motorens toppe som prikker oven på spektret
+        # 3. The engine's peaks as dots on top of the spectrum
         peak_freqs = [p.frequency for p in engine.matched_peaks]
         peak_db = self._to_db(np.array([p.amplitude for p in engine.matched_peaks]))
-        ax.plot(peak_freqs, peak_db, "o", color="red", label="Motorens toppe")
+        ax.plot(peak_freqs, peak_db, "o", color="red", label="Engine peaks")
 
-        # 4. Akser. y-aksen sættes ud fra data inden for det viste område,
-        # så meget lave værdier ved høje frekvenser (OGG) ikke trækker den ned.
+        # 4. Axes. The y-axis is set from the data inside the visible range,
+        # so very low values at high frequencies (OGG) do not pull it down.
         visible = spectrum.frequencies <= self.max_hz
         ax.set_xlim(0, self.max_hz)
         ax.set_ylim(db_floor[visible].min() - 10, db_spectrum[visible].max() + 5)
-        ax.set_xlabel("Frekvens i Hz")
-        ax.set_ylabel("Niveau i dBFS")
+        ax.set_xlabel("Frequency (Hz)")
+        ax.set_ylabel("Level (dBFS)")
 
-        # 5. Titel med resultatet
-        ax.set_title(f"{title}: {engine.revolutions_per_minute:.0f} omdr./min.")
+        # 5. Title with the result
+        ax.set_title(f"{title}: {engine.revolutions_per_minute:.0f} rpm")
         ax.legend()
 
-        # Sørger for, at titel og akser ikke overlapper
+        # Keeps the title and axes from overlapping
         fig.tight_layout()
         return fig
